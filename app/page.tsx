@@ -12,9 +12,20 @@ export default async function Home() {
           <Link href={"/donut"}>Add Donut</Link>
         </div>
         <h1>Donut list</h1>
-        {donuts.map((donut: Donut) => (
-          <div key={donut.id}>{donut.name}</div>
-        ))}
+        <div style={{ display: "flex", gap: "40px" }}>
+          {donuts.map((donut: Donut) => (
+            <div
+              key={donut.id}
+              style={{ border: "1px solid #CCC", padding: "30px" }}
+            >
+              <p>Name: {donut.name}</p>
+              <small style={{ color: "gray" }}>Code: {donut.code}</small>
+              <p>Description: {donut.description}</p>
+              <p>Price: {donut.price}</p>
+              <p>Available: {donut.is_available ? "Yes" : "No"}</p>
+            </div>
+          ))}
+        </div>
       </main>
     </div>
   );
