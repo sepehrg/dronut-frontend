@@ -1,15 +1,20 @@
 "use client";
 
-import { createDonut } from "@/api/api";
+import { createDonut } from "@/api";
+import { ApiError } from "@/api";
 import { CreateDonutData } from "@/types";
 import { useRouter } from "next/navigation";
-import { SubmitEvent } from "react";
+import { useState, SubmitEvent } from "react";
+import { getApiErrorMessage } from "../utils";
 
 export default function DonutPage() {
   const router = useRouter();
 
+  const [error, setError] = useState<string | null>(null);
+
   async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    setError(null);
 
     const formData = new FormData(event.currentTarget);
 
@@ -21,14 +26,22 @@ export default function DonutPage() {
       is_available: formData.get("is_available") === "on",
     };
 
-    await createDonut(data);
-
-    router.push("/")
+    try {
+      await createDonut(data);
+      router.push("/");
+    } catch (error) {
+      setError(getApiErrorMessage(error));
+    }
   }
 
   return (
     <div>
       <h2>Add donut</h2>
+
+      {error && (
+        <div style={{ color: "red", marginBottom: "20px" }}>{error}</div>
+      )}
+
       <form
         onSubmit={onSubmit}
         style={{ display: "flex", flexDirection: "column", gap: "20px" }}
