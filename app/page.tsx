@@ -1,9 +1,16 @@
 import { getDonuts } from "@/api";
+import SearchForm from "@/components/SearchForm";
 import { Donut } from "@/types";
 import Link from "next/link";
 
-export default async function Home() {
-  const donuts = await getDonuts();
+type SearchPageProps = {
+  searchParams: Promise<{ query?: string }>;
+};
+
+export default async function Home({searchParams}: SearchPageProps) {
+  const {query = "" } = await searchParams;
+
+  const donuts = await getDonuts(query);
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -12,6 +19,9 @@ export default async function Home() {
           <Link href={"/donut"}>Add Donut</Link>
         </div>
         <h1>Donut list</h1>
+        <div style={{padding: "20px", textAlign: "right"}}>
+          <SearchForm />
+        </div>
         <div style={{ display: "flex", gap: "40px" }}>
           {donuts.map((donut: Donut) => (
             <div

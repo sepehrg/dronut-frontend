@@ -1,7 +1,6 @@
 "use client";
 
 import { createDonut } from "@/api";
-import { ApiError } from "@/api";
 import { CreateDonutData } from "@/types";
 import { useRouter } from "next/navigation";
 import { useState, SubmitEvent } from "react";
@@ -12,7 +11,7 @@ export default function DonutPage() {
 
   const [error, setError] = useState<string | null>(null);
 
-  async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
+  const onSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
 
@@ -32,7 +31,7 @@ export default function DonutPage() {
     } catch (error) {
       setError(getApiErrorMessage(error));
     }
-  }
+  };
 
   return (
     <div>

@@ -1,12 +1,17 @@
 import { CreateDonutData, Donut } from "@/types";
 import { apiFetch } from "./client";
 
+export const getDonuts = async (query: string): Promise<Donut[]> => {
+  const cleanedQuery = query?.trim();
 
-export async function getDonuts(): Promise<Donut[]> {
-  return apiFetch<Donut[]>("/donuts/");
-}
+  const url = cleanedQuery
+    ? `/donuts/?query=${encodeURIComponent(cleanedQuery)}`
+    : "/donuts/";
 
-export async function createDonut(data: CreateDonutData): Promise<Donut> {
+  return apiFetch<Donut[]>(url);
+};
+
+export const createDonut = async (data: CreateDonutData): Promise<Donut> => {
   return apiFetch<Donut>("/donuts/", {
     method: "POST",
     headers: {
@@ -14,4 +19,4 @@ export async function createDonut(data: CreateDonutData): Promise<Donut> {
     },
     body: JSON.stringify(data),
   });
-}
+};
