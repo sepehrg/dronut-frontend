@@ -31,7 +31,7 @@ export default async function Home({searchParams}: SearchPageProps) {
               <p>Name: {donut.name}</p>
               <small style={{ color: "gray" }}>Code: {donut.code}</small>
               <p>Description: {donut.description}</p>
-              <p>Price: {donut.price}</p>
+              <p>Price: ${donut.price}</p>
               <p>Available: {donut.is_available ? "Yes" : "No"}</p>
             </div>
           ))}
