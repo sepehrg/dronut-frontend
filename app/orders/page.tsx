@@ -1,4 +1,5 @@
 import { getOrders } from "@/api";
+import OrdersList from "@/components/OrdersList";
 import Link from "next/link";
 
 export default async function OrdersPage() {
@@ -10,26 +11,7 @@ export default async function OrdersPage() {
         <Link href="/">Back to donut catalogue</Link>
         <h1>Orders</h1>
 
-        {orders.length === 0 ? (
-          <p>No orders have been placed yet.</p>
-        ) : (
-          <div style={{ display: "grid", gap: "20px" }}>
-            {orders.map((order) => (
-              <article key={order.id} style={{ border: "1px solid #CCC", padding: "20px" }}>
-                <h2>Order {order.id}</h2>
-                <p>Status: {order.status}</p>
-                <ul>
-                  {order.items.map((item) => (
-                    <li key={item.donut_code}>
-                      {item.quantity} × {item.donut_code} at ${item.unit_price}
-                    </li>
-                  ))}
-                </ul>
-                <p>Total: ${order.total}</p>
-              </article>
-            ))}
-          </div>
-        )}
+        <OrdersList initialOrders={orders} />
       </main>
     </div>
   );
