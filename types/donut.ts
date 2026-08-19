@@ -3,7 +3,7 @@ export interface Donut {
   name: string;
   code: string;
   description: string;
-  price: number;
+  price: string;
   is_available: boolean;
 }
 

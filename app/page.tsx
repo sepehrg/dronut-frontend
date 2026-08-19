@@ -1,6 +1,6 @@
 import { getDonuts } from "@/api";
+import DonutCatalogue from "@/components/DonutCatalogue";
 import SearchForm from "@/components/SearchForm";
-import { Donut } from "@/types";
 import Link from "next/link";
 
 type SearchPageProps = {
@@ -22,20 +22,7 @@ export default async function Home({searchParams}: SearchPageProps) {
         <div style={{padding: "20px", textAlign: "right"}}>
           <SearchForm />
         </div>
-        <div style={{ display: "flex", gap: "40px" }}>
-          {donuts.map((donut: Donut) => (
-            <div
-              key={donut.id}
-              style={{ border: "1px solid #CCC", padding: "30px" }}
-            >
-              <p>Name: {donut.name}</p>
-              <small style={{ color: "gray" }}>Code: {donut.code}</small>
-              <p>Description: {donut.description}</p>
-              <p>Price: ${donut.price}</p>
-              <p>Available: {donut.is_available ? "Yes" : "No"}</p>
-            </div>
-          ))}
-        </div>
+        <DonutCatalogue donuts={donuts} />
       </main>
     </div>
   );
