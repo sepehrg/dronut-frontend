@@ -1,7 +1,9 @@
 "use client";
 
-import { Donut } from "@/types";
-import { useMemo, useState } from "react";
+import { createOrder } from "@/api";
+import { Donut, Order } from "@/types";
+import { getApiErrorMessage } from "@/app/utils";
+import { FormEvent, useMemo, useState } from "react";
 
 type DonutCatalogueProps = {
   donuts: Donut[];
@@ -11,6 +13,9 @@ type Cart = Record<string, number>;
 
 export default function DonutCatalogue({ donuts }: DonutCatalogueProps) {
   const [cart, setCart] = useState<Cart>({});
+  const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const cartItems = useMemo(
     () =>
@@ -36,6 +41,33 @@ export default function DonutCatalogue({ donuts }: DonutCatalogueProps) {
     });
   }
 
+  function addToCart(donutCode: string) {
+    setPlacedOrder(null);
+    setError(null);
+    setQuantity(donutCode, (cart[donutCode] ?? 0) + 1);
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const order = await createOrder({
+        donuts: cartItems.map(({ donut, quantity }) => ({
+          donut_code: donut.code,
+          quantity,
+        })),
+      });
+      setPlacedOrder(order);
+      setCart({});
+    } catch (submissionError) {
+      setError(getApiErrorMessage(submissionError));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <div style={{ display: "grid", gap: "32px", width: "100%" }}>
       <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
@@ -49,7 +81,7 @@ export default function DonutCatalogue({ donuts }: DonutCatalogueProps) {
             <button
               type="button"
               disabled={!donut.is_available}
-              onClick={() => setQuantity(donut.code, (cart[donut.code] ?? 0) + 1)}
+              onClick={() => addToCart(donut.code)}
             >
               {donut.is_available ? "Add to order" : "Unavailable"}
             </button>
@@ -58,11 +90,24 @@ export default function DonutCatalogue({ donuts }: DonutCatalogueProps) {
       </div>
 
       <aside aria-live="polite" style={{ border: "1px solid #CCC", padding: "20px" }}>
-        <h2>Your order</h2>
-        {cartItems.length === 0 ? (
-          <p>Your order is empty.</p>
-        ) : (
+        {placedOrder ? (
           <>
+            <h2>Order placed</h2>
+            <p>Your order has been received and is {placedOrder.status.toLowerCase()}.</p>
+            <p>Order ID: {placedOrder.id}</p>
+            <p>Total: ${placedOrder.total}</p>
+            <button type="button" onClick={() => setPlacedOrder(null)}>
+              Start another order
+            </button>
+          </>
+        ) : cartItems.length === 0 ? (
+          <>
+            <h2>Your order</h2>
+          <p>Your order is empty.</p>
+          </>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <h2>Your order</h2>
             <ul style={{ display: "grid", gap: "12px", listStyle: "none", padding: 0 }}>
               {cartItems.map(({ donut, quantity }) => (
                 <li key={donut.code} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -84,9 +129,12 @@ export default function DonutCatalogue({ donuts }: DonutCatalogueProps) {
               ))}
             </ul>
             <p>Subtotal: ${subtotal.toFixed(2)}</p>
-          </>
+            {error && <p role="alert" style={{ color: "red" }}>{error}</p>}
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Placing order..." : "Place order"}
+            </button>
+          </form>
         )}
-        <p>Order submission and confirmation will be added next.</p>
       </aside>
     </div>
   );
